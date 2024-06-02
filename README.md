@@ -2,10 +2,39 @@
 Aplikasi ini dibuat untuk memenuhi tugas akhir dengan fitur sebagai berikut:
 
 - Pasien.
+  <ul>
+    <li>Registrasi dan manajemen akun pasien</li>❌
+    <li>Profil pasien lengkap (termasuk riwayat kesehatan)</li>❌
+    <li>Jadwal janji temu dengan dokter</li>❌
+    <li>Akses ke riwayat medis dan resep obat</li>❌
+    <li>Sistem notifikasi untuk pengingat janji temu dan informasi kesehatan</li>❌
+  </ul>
 - Dokter.
+  <ul>
+    <li>Login dan manajemen akun dokter</li>❌
+    <li>Jadwal praktik dan manajemen pasien</li>❌
+    <li>Catatan medis pasien dan riwayat perawatan</li>❌
+    <li>Resep obat online</li>❌
+    <li>Sistem komunikasi dengan pasien</li>❌
+  </ul>
 - Poli.
+  <ul>
+    <li>Daftar poli dan jam operasional</li>❌
+    <li>Penjadwalan janji temu berdasarkan poli</li>❌
+    <li>Integrasi dengan sistem antrian prioritas</li>❌
+  </ul>
 - Antrian Prioritas.
+  <ul>
+    <li>Sistem antrian berdasarkan kategori pasien (darurat, umum, lansia, dll.)</li>❌
+    <li>Integrasi dengan data pasien dan riwayat kesehatan</li>❌
+    <li>Meminimalkan waktu tunggu pasien</li>❌
+  </ul>
 - Riwayat Kesehatan.
+  <ul>
+    <li>Menyimpan semua data medis pasien secara aman</li>❌
+    <li>Akses mudah bagi pasien dan dokter</li>❌
+    <li>Memudahkan diagnosis dan perawatan</li>❌
+  </ul>
 
 Teknologi yang digunakan:
 
