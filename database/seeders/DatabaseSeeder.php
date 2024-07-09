@@ -14,12 +14,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            UsersTableSeeder::class,
-            PasiensTableSeeder::class,
-            PolisTableSeeder::class,
-            DoktersTableSeeder::class,
-            AntriansTableSeeder::class,
-            RiwayatKesehatansTableSeeder::class,
+            UserTable::class,
+            PolyclinicTable::class,
+            DoctorTable::class,
+            PatientTable::class,
+            HealthRecordTable::class,
+            AppointmentTable::class,
+            MessageTable::class,
+            AdminTable::class,
+            QueueTable::class,
+            AttendanceTable::class,
         ]);
     }
 }

@@ -1,54 +1,64 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DokterController;
-use App\Http\Controllers\PasienController;
-use App\Http\Controllers\AntrianController;
-use App\Http\Controllers\DokterDashboardController;
-use App\Http\Controllers\LandingController;
-use App\Http\Controllers\PasienDashboardController;
-use App\Http\Controllers\RiwayatKesehatanController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\HealthRecordController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\QueueController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', [LandingController::class, 'index']);
-Route::get('/queue', [LandingController::class, 'queue'])->name('queue');
-Route::get('/poli', [LandingController::class, 'poli']);
-Route::get('/doctor', [LandingController::class, 'doctor']);
-Route::get('/about', [LandingController::class, 'about']);
-
-Route::group(['prefix' => 'pasien'], function () {
-    // guest middleware
-    Route::group(['middleware' => 'guest'], function () {
-        Route::get('/login', [AuthController::class, 'loginPasien'])->name('pasien.login');
-        Route::get('/register', [AuthController::class, 'register'])->name('pasien.register');
-        Route::post('/auth-register', [AuthController::class, 'authRegister'])->name('pasien.processRegister');
-        Route::post('/login-auth', [AuthController::class, 'authPasien'])->name('pasien.auth');
-    });
-    // auth middleware
-    Route::group(['middleware' => 'auth'], function () {
-        Route::get('/logout', [AuthController::class, 'logoutPasien'])->name('pasien.logout');
-        Route::get('/dashboard', [PasienDashboardController::class, 'index'])->name('pasien.dashboard');
-        Route::get('/queue', [AntrianController::class, 'indexPasien'])->name('pasien.antrian');
-        Route::get('/history', [RiwayatKesehatanController::class, 'indexPasien'])->name('pasien.riwayat');
-        Route::get('/profile', [PasienController::class, 'profile'])->name('pasien.profile');
-        Route::get('/setting', [PasienController::class, 'setting'])->name('pasien.setting');
-        Route::post('/setting/update-profile', [PasienController::class, 'updateProfile'])->name('pasien.updateprofile');
-    });
+Route::get('/', function () {
+    return view('welcome');
 });
-Route::group(['prefix' => 'dokter'], function () {
-    // guest middleware
-    Route::group(['middleware' => 'dokter.guest'], function () {
-        Route::get('/login', [AuthController::class, 'loginDokter'])->name('dokter.login');
-        Route::post('/auth-dokter', [AuthController::class, 'authDokter'])->name('dokter.auth');
-    });
-    // auth middleware
-    Route::group(['middleware' => 'dokter.auth'], function () {
-        Route::get('/logout', [AuthController::class, 'logoutDokter'])->name('dokter.logout');
-        Route::get('/dashboard', [DokterDashboardController::class, 'index'])->name('dokter.dashboard');
-        Route::get('/queue', [AntrianController::class, 'indexDokter'])->name('dokter.antrian');
-        Route::get('/health-record', [RiwayatKesehatanController::class, 'indexDokter'])->name('dokter.rekmed');
-        Route::get('/history', [RiwayatKesehatanController::class, 'indexDokter'])->name('dokter.riwayat');
-        Route::get('/profile', [DokterController::class, 'profile'])->name('dokter.profile');
-        Route::get('/setting', [DokterController::class, 'setting'])->name('dokter.setting');
-    });
+
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::get('/reset-password', [AuthController::class, 'resetpass'])->name('resetpass');
+Route::post('/register/store', [AuthController::class, 'store'])->name('store');
+Route::post('/login/auth', [AuthController::class, 'authenticate'])->name('auth');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::middleware('auth')->prefix('patient')->group(function () {
+    Route::get('/dashboard', [PatientController::class, 'index'])->name('patient.dashboard');
+    Route::get('/queues{poli_id?}', [QueueController::class, 'index'])->name('patient.queue');
+    Route::post('/queues/store', [QueueController::class, 'store'])->name('patient.storequeue');
+    Route::post('/queues/delete/{id}', [QueueController::class, 'destroy'])->name('patient.destroyqueue');
+    Route::get('/appointment', [AppointmentController::class, 'index'])->name('patient.appointment');
+    Route::post('/appointment/store', [AppointmentController::class, 'store'])->name('patient.appointmentstore');
+    Route::post('/appointment/{id}', [AppointmentController::class, 'destroy'])->name('patient.appointmentdestroy');
+    Route::get('/health-record', [HealthRecordController::class, 'index'])->name('patient.healthrecord');
+    Route::get('/message', [MessageController::class, 'index'])->name('patient.message');
+    Route::get('/message/{sender_id?}', [MessageController::class, 'index'])->name('patient.message');
+    Route::post('/message/store', [MessageController::class, 'store'])->name('patient.messagestore');
+    Route::get('/profile', [UserController::class, 'profile'])->name('patient.profile');
+    Route::get('/setting', [UserController::class, 'setting'])->name('patient.setting');
+    Route::post('/setting/update-profile', [UserController::class, 'updateProfile'])->name('patient.updateProfile');
+    Route::post('/setting/update-photo', [UserController::class, 'updatePhoto'])->name('patient.updatePhoto');
+    Route::post('/setting/update-password', [UserController::class, 'updatePassword'])->name('patient.updatePassword');
+});
+Route::middleware('doctorAuth')->prefix('doctor')->group(function () {
+    Route::get('/dashboard', [DoctorController::class, 'index'])->name('doctor.dashboard');
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('doctor.attendance');
+    Route::get('/attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
+    Route::get('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
+    Route::get('/appointment', [AppointmentController::class, 'index'])->name('doctor.appointment');
+    Route::post('/appointment/update/{id}', [AppointmentController::class, 'update'])->name('doctor.appointmentupdate');
+    Route::get('/health-record', [HealthRecordController::class, 'index'])->name('doctor.healthrecord');
+    Route::post('/health-record/store', [HealthRecordController::class, 'store'])->name('doctor.healthrecordstore');
+    Route::get('/message', [MessageController::class, 'index'])->name('doctor.message');
+    Route::get('/message/{sender_id?}', [MessageController::class, 'index'])->name('doctor.message');
+    Route::post('/message/store', [MessageController::class, 'store'])->name('doctor.messagestore');
+    Route::get('/profile', [UserController::class, 'profile'])->name('doctor.profile');
+    Route::get('/setting', [UserController::class, 'setting'])->name('doctor.setting');
+    Route::post('/setting/update-profile', [UserController::class, 'updateProfile'])->name('doctor.updateProfile');
+    Route::post('/setting/update-photo', [UserController::class, 'updatePhoto'])->name('doctor.updatePhoto');
+    Route::post('/setting/update-password', [UserController::class, 'updatePassword'])->name('doctor.updatePassword');
+});
+Route::middleware('adminAuth')->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 });

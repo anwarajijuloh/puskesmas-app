@@ -38,11 +38,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'pasiens',
-        ],
-        'dokter' => [
-            'driver' => 'session',
-            'provider' => 'dokters',
+            'provider' => 'users',
         ],
     ],
 
@@ -64,11 +60,7 @@ return [
     */
 
     'providers' => [
-        'pasiens' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
-        'dokters' => [
+        'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
@@ -100,13 +92,7 @@ return [
 
     'passwords' => [
         'users' => [
-            'provider' => 'pasiens',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-        'dokters' => [
-            'provider' => 'dokters',
+            'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,
