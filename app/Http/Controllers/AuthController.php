@@ -2,107 +2,112 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Doctor;
 use App\Models\User;
+use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function loginPasien()
+    public function login()
     {
-        $title = 'Login Pasien';
-        return view('pasiens.login', compact('title'));
-    }
-    public function authPasien(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if ($validator->passes()) {
-            if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
-                return redirect()->route('pasien.dashboard');
-            } else {
-                return redirect()->route('pasien.login')->with('error', 'Email or password is incorrect');
-            }
-        } else {
-            return redirect()->route('pasien.login')->withInput()->withErrors($validator);
-        }
-    }
-    public function loginDokter()
-    {
-        $title = 'Login Dokter';
-        return view('dokters.login', compact('title'));
-    }
-    public function authDokter(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if ($validator->passes()) {
-            if(Auth::guard('dokter')->attempt(['email' => $request->email, 'password' => $request->password])){
-                if(Auth::guard('dokter')->user()->role != 'dokter') {
-                    Auth::guard('dokter')->logout();
-                    return redirect()->route('dokter.login')->with('error', 'You do not have permission to access this page');
-                }
-                return redirect()->route('dokter.dashboard')->with('success', 'login successfully!');
-            } else {
-                return redirect()->route('dokter.login')->with('error', 'Email or password is incorrect');
-            }
-        } else {
-            return redirect()->route('dokter.login')->withInput()->withErrors($validator);
-        }
+        return view('auth.login');
     }
     public function register()
     {
-        $title = 'Register Pasien';
-        return view('pasiens.register', compact('title'));
+        return view('auth.register');
     }
-    public function authRegister(Request $request)
+    public function resetpass()
+    {
+        return view('auth.reset-password');
+    }
+    public function logout()
+    {
+        auth()->logout();
+        return redirect()->route('login');
+    }
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:5',
-            'password_confirmation' => 'required',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
         ]);
 
         if ($validator->passes()) {
             $user = new User();
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->password =  Hash::make($request->password);
-            $user->role = 'pasien';
+            $user->password = Hash::make($request->password);
+            $user->role = 'patient';
             $user->save();
 
-            return redirect()->route('pasien.login')->with('success', 'You have registered succesfully!');
-        } else {
-            return redirect()->route('pasien.register')->withInput()->withErrors($validator);
+            $patient = new Patient();
+            $patient->user_id = $user->id;
+            $patient->photo = 'assets/images/blank-profile.jpg';
+            $patient->save();
+
+            return redirect()->route('login')->with('success', 'Registration Successfully!');
+        }else {
+            return redirect()->route('register')->withInput()->withErrors($validator);
         }
     }
-    public function logoutPasien()
+    public function resetPassword(Request $request)
     {
-        Auth::logout();
-        return redirect()->route('pasien.login')->with('success', 'You have logged out succesfully!');
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+        ]);
+
+        if ($validator->passes()) {
+            $user = User::where('email', $request->email)->first();
+            if ($user) {
+                $token = md5(time().$user->email);
+                $user->remember_token = $token;
+                $user->save();
+
+                $url = route('reset.password.verify', ['token' => $token]);
+                // Send email to user with the verification link
+                // Example:
+                // Mail::to($user->email)->send(Mailable($url));
+                //...
+
+                return redirect()->route('reset.password.success')->with('success', 'Reset password link has been sent to your email.');
+            } else {
+                return redirect()->route('reset.password')->with('error', 'Email not found.');
+            }
+        } else {
+            return redirect()->route('reset.password')->withInput()->withErrors($validator);
+        }
     }
-    public function logoutDokter()
+    public function authenticate(Request $request)
     {
-        Auth::guard('dokter')->logout();
-        return redirect()->route('dokter.login')->with('success', 'You have logged out succesfully!');
-    }
-    public function dashboardPasien()
-    {
-        $title = 'Dashboard Pasien';
-        return view('pasiens.index', compact('title'));
-    }
-    public function dashboardDokter()
-    {
-        $title = 'Dashboard Dokoter';
-        return view('dokters.index', compact('title'));
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->passes()) {
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                
+                if(Auth::user()->role === 'patient')
+                {
+                    return redirect()->route('patient.dashboard');
+                } else if(Auth::user()->role === 'doctor')
+                {
+                    return redirect()->route('doctor.dashboard');
+                } else if(Auth::user()->role === 'admin')
+                {
+                    return redirect()->route('admin.dashboard');
+                }
+
+            } else {
+                return redirect()->route('login')->with('error', 'Email atau Password salah!');
+            }
+        } else {
+            return redirect()->route('login')->withInput()->withErrors($validator);
+        }
     }
 }

@@ -12,12 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'dokter.guest' => \App\Http\Middleware\DokterRedirect::class,
-            'dokter.auth' => \App\Http\Middleware\DokterAuthenticate::class,
+            'doctorAuth' => \App\Http\Middleware\DoctorAuth::class,
+            'patientAuth' => \App\Http\Middleware\PatientAuth::class,
+            'adminAuth' => \App\Http\Middleware\AdminAuth::class,
         ]);
+        
         $middleware->redirectTo(
-            guests: '/pasien/login',
-            users: '/pasien/dashboard',
+            guests: '/login',
+            users: '/dashboard',
         );
     })
     ->withExceptions(function (Exceptions $exceptions) {
