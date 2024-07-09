@@ -6,15 +6,14 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\HealthRecordController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
@@ -61,4 +60,8 @@ Route::middleware('doctorAuth')->prefix('doctor')->group(function () {
 });
 Route::middleware('adminAuth')->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/doctor-request', [AdminController::class, 'showDoctorRequests'])->name('admin.doctor-request');
+    Route::patch('/doctor-request/{id}/approve', [AdminController::class, 'approveDoctorRequest'])->name('admin.doctor-request.approve');
+    Route::patch('/doctor-request/{id}/reject', [AdminController::class, 'rejectDoctorRequest'])->name('admin.doctor-request.reject');
+    Route::get('/appointment', [AdminController::class, 'appointment'])->name('admin.appointment');
 });

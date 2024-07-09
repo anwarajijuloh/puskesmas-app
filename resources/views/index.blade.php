@@ -10,8 +10,8 @@
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon">
-    <link href="assets/img/favicon.png" rel="apple-touch-icon">
+    <link href="assets/images/favicon.png" rel="icon">
+    <link href="assets/images/favicon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link
@@ -19,16 +19,16 @@
         rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="asset/vendor/aos/aos.css" rel="stylesheet">
+    <link href="asset/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="asset/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="asset/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="asset/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="asset/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="asset/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="asset/css/style.css" rel="stylesheet">
 
     <!-- =======================================================
   * Template Name: Bootslander
@@ -48,7 +48,8 @@
             <div class="logo">
                 {{-- <h1><a href="index.html"><span>PuskesmasApp</span></a></h1> --}}
                 <!-- Uncomment below if you prefer to use an image logo -->
-                <a href="index.html"><img src="assets/img/main-logo.svg" alt="" class="img-fluid"></a>
+                <a href="{{ route('landing') }}"><img src="assets/images/main-logo.svg" alt=""
+                        class="img-fluid"></a>
             </div>
 
             <nav id="navbar" class="navbar">
@@ -58,8 +59,19 @@
                     <li><a class="nav-link scrollto" href="#poli">Poli</a></li>
                     <li><a class="nav-link scrollto" href="#queue">Antrian</a></li>
                     <li><a class="nav-link scrollto" href="#doctor">Dokter</a></li>
-                    <div class="text-center">
-                        <a href="#" class="btn">Masuk</a>
+                    <div class="text-center ms-4">
+                        @if (Auth::check())
+                            @if ($user->role === 'patient')
+                                <a href="{{ route('patient.dashboard') }}" class="btn btn-primary px-4">Dashboard</a>
+                            @elseif ($user->role === 'doctor')
+                                <a href="{{ route('doctor.dashboard') }}" class="btn btn-primary px-4">Dashboard</a>
+                            @elseif ($user->role === 'admin')
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-primary px-4">Dashboard</a>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-primary px-4">Masuk</a>
+                        @endif
+
                     </div>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
@@ -80,12 +92,26 @@
                         <h1>Dapat penanganan cepat dengan <span>MyPuskesmas</span></h1>
                         <h2>Kami siap melayani anda 24 jam melalui online.</h2>
                         <div class="text-center text-lg-start">
-                            <a href="#about" class="btn-get-started scrollto">Mulai Sekarang</a>
+                            @if (Auth::check())
+                                @if ($user->role === 'patient')
+                                    <a href="{{ route('patient.dashboard') }}" class="btn-get-started scrollto">Mulai
+                                        Sekarang</a>
+                                @elseif ($user->role === 'doctor')
+                                    <a href="{{ route('doctor.dashboard') }}" class="btn-get-started scrollto">Mulai
+                                        Sekarang</a>
+                                @elseif ($user->role === 'admin')
+                                    <a href="{{ route('admin.dashboard') }}" class="btn-get-started scrollto">Mulai
+                                        Sekarang</a>
+                                @endif
+                            @else
+                                <a href="{{ route('login') }}" class="btn-get-started scrollto">Mulai Sekarang</a>
+                            @endif
+
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 order-1 order-lg-2 hero-img" data-aos="zoom-out" data-aos-delay="300">
-                    <img src="assets/img/public-health-animate.svg" class="img-fluid animated" alt="">
+                    <img src="asset/img/public-health-animate.svg" class="img-fluid animated" alt="">
                 </div>
             </div>
         </div>
@@ -161,11 +187,11 @@
                 </div>
 
                 <div class="row" data-aos="fade-left">
-                    @foreach ($polis as $poli)
+                    @foreach ($polyclinics as $poly)
                         <div class="col-lg-3 col-md-4 mt-4">
                             <div class="icon-box" data-aos="zoom-in" data-aos-delay="50">
                                 <i class="ri-hospital-line" style="color: #5578ff;"></i>
-                                <h3>{{ $poli->nama }}</h3>
+                                <h3>{{ $poly->name }}</h3>
                             </div>
                         </div>
                     @endforeach
@@ -187,7 +213,7 @@
                         <div class="col-lg-6 mt-2">
                             <div class="count-box">
                                 <i class="bi-person-badge"></i>
-                                <span data-purecounter-start="0" data-purecounter-end="{{ $pasienCount }}"
+                                <span data-purecounter-start="0" data-purecounter-end="{{ $patientCount }}"
                                     data-purecounter-duration="1" class="purecounter"></span>
                                 <p>Pasien Terdaftar</p>
                             </div>
@@ -196,7 +222,7 @@
                         <div class="col-lg-6 mt-2">
                             <div class="count-box">
                                 <i class="bi-person-lines-fill"></i>
-                                <span data-purecounter-start="0" data-purecounter-end="{{ $antrianCount }}"
+                                <span data-purecounter-start="0" data-purecounter-end="{{ $queueCount }}"
                                     data-purecounter-duration="1" class="purecounter"></span>
                                 <p>Jumlah Antrian</p>
                             </div>
@@ -205,7 +231,7 @@
                         <div class="col-lg-6 mt-2">
                             <div class="count-box">
                                 <i class="bi-list-check"></i>
-                                <span data-purecounter-start="0" data-purecounter-end="{{ $antrianDoneCount }}"
+                                <span data-purecounter-start="0" data-purecounter-end="{{ $appointmentDoneCount }}"
                                     data-purecounter-duration="1" class="purecounter"></span>
                                 <p>Antrian Selesai</p>
                             </div>
@@ -214,7 +240,7 @@
                         <div class="col-lg-6 mt-2">
                             <div class="count-box">
                                 <i class="bi-file-earmark-person"></i>
-                                <span data-purecounter-start="0" data-purecounter-end="{{ $dokters->count() }}"
+                                <span data-purecounter-start="0" data-purecounter-end="{{ $doctors->count() }}"
                                     data-purecounter-duration="1" class="purecounter"></span>
                                 <p>Jumlah Dokter</p>
                             </div>
@@ -235,12 +261,13 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($antrians as $antrian)
+                                            @forelse ($queues as $queue)
                                                 <tr>
-                                                    <td>{{ $antrian->poli->nama }}</td>
-                                                    <td>{{ $antrian->dokter->user->name }}</td>
-                                                    <td><label class="badge badge-danger">{{ $antrian->status }}</label></td>
-                                                    <td>{{ $antrian->created_at->format('H:i a') }}</td>
+                                                    <td>{{ $queue->polyclinic->name }}</td>
+                                                    <td>{{ $queue->doctor->user->name }}</td>
+                                                    <td>{{ $queue->patient->user->name }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($queue->queued_at)->format('H:i a') }}
+                                                    </td>
                                                 </tr>
                                             @empty
                                                 <tr>
@@ -249,6 +276,7 @@
                                             @endforelse
                                         </tbody>
                                     </table>
+                                    {!! $queues->withQueryString()->links('vendor.pagination.mypagination') !!}
                                 </div>
                             </div>
                         </div>
@@ -270,14 +298,14 @@
 
                 <div class="row aos-init aos-animate" data-aos="fade-left">
 
-                    @foreach ($dokters as $dokter)
+                    @foreach ($doctors as $doctor)
                         <div class="col-lg-3 col-md-6 mt-4">
                             <div class="member aos-init aos-animate" data-aos="zoom-in" data-aos-delay="100">
-                                <div class="pic"><img src="assets/img/team/dokter{{ $dokter->id }}.jpg"
-                                        class="img-fluid" alt=""></div>
+                                <div class="pic"><img src="{{ asset($doctor->photo) }}" class="img-fluid"
+                                        alt=""></div>
                                 <div class="member-info">
-                                    <h4>{{ $dokter->user->name }}</h4>
-                                    <span>{{ $dokter->poli->nama }}</span>
+                                    <h4>{{ $doctor->user->name }}</h4>
+                                    <span>{{ $doctor->polyclinic->name }}</span>
                                 </div>
                             </div>
                         </div>
@@ -313,15 +341,15 @@
     <div id="preloader"></div>
 
     <!-- Vendor JS Files -->
-    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="assets/vendor/aos/aos.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="asset/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="asset/vendor/aos/aos.js"></script>
+    <script src="asset/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="asset/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="asset/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="asset/vendor/php-email-form/validate.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="assets/js/main.js"></script>
+    <script src="asset/js/main.js"></script>
 
 </body>
 

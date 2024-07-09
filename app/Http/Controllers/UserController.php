@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Polyclinic;
 use Illuminate\Http\Request;
+use App\Models\DoctorUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -20,32 +22,50 @@ class UserController extends Controller
         $user = Auth::user();
         $patient = $user->patient;
         $doctor = $user->doctor;
+        $polyclinics = Polyclinic::all();
 
-        return view('user.setting', compact('user', 'patient', 'doctor'));
+        return view('user.setting', compact('user', 'patient', 'doctor', 'polyclinics'));
     }
     public function updateProfile(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
-            'gender' => 'required|string|in:Laki-laku,Perempuan',
-            'dob' => 'required|date',
-            'address' => 'required|string|max:255',
-        ]);
-        /** @var \App\Models\User */
-        $user = Auth::user();
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
-        $patient = $user->patient;
-        $patient->update([
-            'gender' => $request->gender,
-            'dob' => $request->dob,
-            'address' => $request->address,
-        ]);
+        if (auth()->user()->role == 'patient') {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
+                'gender' => 'required|string|in:Laki-laku,Perempuan',
+                'dob' => 'required|date',
+                'address' => 'required|string|max:255',
+            ]);
+            /** @var \App\Models\User */
+            $user = Auth::user();
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+            ]);
+            $patient = $user->patient;
+            $patient->update([
+                'gender' => $request->gender,
+                'dob' => $request->dob,
+                'address' => $request->address,
+            ]);
 
-        return redirect()->back()->with('success', 'Profile updated successfully.');
+            return redirect()->back()->with('success', 'Profile updated successfully.');
+        } elseif (auth()->user()->role == 'doctor') {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
+                'polyclinic_id' => 'required|exists:polyclinics,id',
+            ]);
+
+            DoctorUpdateRequest::create([
+                'doctor_id' => Auth::id(),
+                'name' => $request->name,
+                'email' => $request->email,
+                'polyclinic_id' => $request->polyclinic_id,
+            ]);
+
+            return redirect()->back()->with('success', 'Pengajuan update profil berhasil diajukan!');
+        }
     }
     public function updatePhoto(Request $request)
     {

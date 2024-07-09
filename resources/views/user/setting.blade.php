@@ -22,19 +22,27 @@
                         <div class="card-rounded">
                             <div class="card-body">
                                 <h5 class="card-title">Update Information</h5>
-                                <form action="{{ route('patient.updateProfile') }}" method="POST">
+                                <form action="{{ route('doctor.updateProfile') }}" method="POST">
                                     @csrf
                                     <div class="form-group">
-                                        <label for="name">Name</label>
-                                        <input type="text" class="form-control" id="name" name="name"
-                                            value="{{ Auth::user()->name }}">
+                                        <label for="name">Nama</label>
+                                        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', Auth::user()->name) }}" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="email">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email"
-                                            value="{{ Auth::user()->email }}">
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email', Auth::user()->email) }}" required>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Update</button>
+                                    <div class="form-group">
+                                        <label for="polyclinic">Poliklinik</label>
+                                        <select class="form-control" id="polyclinic" name="polyclinic_id" required>
+                                            @foreach($polyclinics as $polyclinic)
+                                                <option value="{{ $polyclinic->id }}" {{ old('polyclinic_id', Auth::user()->doctor->polyclinic_id) == $polyclinic->id ? 'selected' : '' }}>
+                                                    {{ $polyclinic->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Ajukan Perubahan</button>
                                 </form>
                             </div>
                         </div>

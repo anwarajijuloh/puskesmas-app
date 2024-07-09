@@ -1,5 +1,5 @@
 @extends('auth.app')
-@section('title', 'Register Patien')
+@section('title', 'Register Account')
 @section('header', 'New here?')
 @section('subtitle', 'Signing up is easy. It only takes a few steps.')
 @section('content')

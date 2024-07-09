@@ -6,7 +6,7 @@
             </button>
         </div>
         <div>
-            <a class="navbar-brand brand-logo" href="index.html">
+            <a class="navbar-brand brand-logo" href="{{ route('admin.dashboard') }}">
                 <img src="{{ asset('assets') }}/images/pusk-logo.svg" alt="logo" />
             </a>
             <a class="navbar-brand brand-logo-mini" href="index.html">
@@ -19,7 +19,7 @@
             <li class="nav-item fw-semibold d-none d-lg-block ms-0">
                 <h1 class="welcome-text">Selamat datang, <span class="text-black fw-bold">{{ $user->name }}</span>
                 </h1>
-                <h3 class="welcome-sub-text">Layani masyarakat dengan sepenuh hati. </h3>
+                <h3 class="welcome-sub-text">Kelola reques dokter dan pasien. </h3>
             </li>
         </ul>
         <ul class="navbar-nav ms-auto">
@@ -36,15 +36,6 @@
                         <p class="mb-1 mt-3 fw-semibold">{{ $user->name }}</p>
                         <p class="fw-light text-muted mb-0">{{ $user->email }}</p>
                     </div>
-                    <a class="dropdown-item"><i
-                            class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My
-                        Profile </a>
-                    <a class="dropdown-item"><i
-                            class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i>
-                        Appointment</a>
-                    <a class="dropdown-item"><i
-                            class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i>
-                        Messages</a>
                     <form action="{{ route('logout') }}" method="post">
                         @csrf
                         <button class="dropdown-item" type="submit"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign
