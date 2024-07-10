@@ -22,7 +22,7 @@ Route::post('/register/store', [AuthController::class, 'store'])->name('store');
 Route::post('/login/auth', [AuthController::class, 'authenticate'])->name('auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('auth')->prefix('patient')->group(function () {
+Route::middleware(['auth', 'patientAuth'])->prefix('patient')->group(function () {
     Route::get('/dashboard', [PatientController::class, 'index'])->name('patient.dashboard');
     Route::get('/queues{poli_id?}', [QueueController::class, 'index'])->name('patient.queue');
     Route::post('/queues/store', [QueueController::class, 'store'])->name('patient.storequeue');
